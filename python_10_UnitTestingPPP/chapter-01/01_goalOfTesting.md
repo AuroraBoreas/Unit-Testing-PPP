@@ -104,4 +104,80 @@ all other parts can be divided into three categories.
 - external services and dependencies, such as the database and third-party systems
 - code that glues everything together
 
-P38
+## a test double, originated from "a stunt double" (特技替身演员)
+
+a test double is an object that looks and ehaves like its release-intended counterpart
+but is actually a simplified version that reduces the complexity and facilittates testing.
+
+this term was introduced by Gerard Meszaros in his book, xUnit Test Patterns: Refactoring Test Code.
+
+the name itself comes from the notion of a stunt double in movies.
+
+### MUT
+
+a method under test (MUT) is a method in the SUT called by the test.
+the terms MUT and SUT are often used as synonyms, but normally, MUT refers to a method
+while SUT refers to the whole class.
+
+### MOCK
+
+A mock is a special kind of test double that allows you to examine
+interactions between the system under test and its collaborators
+
+### isolation problem
+
+Instead, unit tests themselves should be run in isolation from each other. 
+That way, you can run the tests in parallel, sequentially, and in any order,
+whatever fits you best, and they still won’t affect each other’s outcome.
+
+isolation tests from each other means it's fine to exercise several classes at once
+as long as they all reside in the memmory and don't reach out to a shared state,
+thru which the tests can communicate and affect each other's execution context.
+
+
+## shared, private and out-of-process dependencies
+
+dependency principles, "cohesion". read more for OOD, @uncle Bob
+
+### shared dependency
+
+a shared dependency is a dependency that is shared btwn tests 
+and provides means for those tests to affect each other's outcome.
+
+a typical example of shared dependency is a static mutable field.
+a change to such a field is visible across all unit tests running with the same process.
+a database is another typical example of a shared dependency.
+
+### private dependency
+
+a private dependency is a dependency that is NOT shared
+
+### out-of-process dependency
+
+an out-of-process dependency is a dependency that runs outside the application's execution process;
+it's a proxy to data that is NOT yet in the memory.
+
+an out-of-process dependency corresponds to a shared dependency in the vast majority of cases, but not always.
+
+for example, a database is both out-of-process and shared.
+but if u launch that database in a Docker container before each test run,
+that would make this dependency out-of-process but not shared,
+since tests no longer work with the same instance of it.
+
+similarly, a read-only database is also out-of-process but not shared, even if it's reused by tests.
+
+tests can't mutate data in such a database and thus can't affect each other's outcome.
+
+#### concept: in-process vs out-of-process?
+
+link: docs.embarcadero.com
+
+it's all about where dependency resides..
+
+Table: in-process vs out-of-process vs remote
+
+| concept           | explanation                                                                         |
+|-------------------|-------------------------------------------------------------------------------------|
+| in-process        | a library(DLL) running in the same process space as the client                      |
+| out-of-process    | another app(EXE) running in a different space but on the same machine as the client |
+| remote            | a DLL or app running on a different machine from that of the client.                |
